@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/smarsu/tencent/cc/smcc_201229/core/ast.cc
+ast.h
+/Users/smarsu/tencent/cc/smcc_201229/core/ast.h
+memory
+-
+utility
+-
+
+/Users/smarsu/tencent/cc/smcc_201229/core/ast.h
+string
+-
+map
+-
+reader.h
+/Users/smarsu/tencent/cc/smcc_201229/core/reader.h
+expr.h
+/Users/smarsu/tencent/cc/smcc_201229/core/expr.h
+
+/Users/smarsu/tencent/cc/smcc_201229/core/expr.h
+vector
+-
+string
+-
+memory
+-
+ast.h
+/Users/smarsu/tencent/cc/smcc_201229/core/ast.h
+
+/Users/smarsu/tencent/cc/smcc_201229/core/reader.h
+cstdio
+-
+
