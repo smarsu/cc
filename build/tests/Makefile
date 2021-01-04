@@ -130,6 +130,36 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+tests/CMakeFiles/test_call.dir/rule:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_call.dir/rule
+.PHONY : tests/CMakeFiles/test_call.dir/rule
+
+# Convenience name for target.
+test_call: tests/CMakeFiles/test_call.dir/rule
+
+.PHONY : test_call
+
+# fast build rule for target.
+test_call/fast:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_call.dir/build.make tests/CMakeFiles/test_call.dir/build
+.PHONY : test_call/fast
+
+# Convenience name for target.
+tests/CMakeFiles/test_ast.dir/rule:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_ast.dir/rule
+.PHONY : tests/CMakeFiles/test_ast.dir/rule
+
+# Convenience name for target.
+test_ast: tests/CMakeFiles/test_ast.dir/rule
+
+.PHONY : test_ast
+
+# fast build rule for target.
+test_ast/fast:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ast.dir/build.make tests/CMakeFiles/test_ast.dir/build
+.PHONY : test_ast/fast
+
+# Convenience name for target.
 tests/CMakeFiles/test_gettok.dir/rule:
 	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_gettok.dir/rule
 .PHONY : tests/CMakeFiles/test_gettok.dir/rule
@@ -143,6 +173,60 @@ test_gettok: tests/CMakeFiles/test_gettok.dir/rule
 test_gettok/fast:
 	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_gettok.dir/build.make tests/CMakeFiles/test_gettok.dir/build
 .PHONY : test_gettok/fast
+
+test_ast.o: test_ast.cc.o
+
+.PHONY : test_ast.o
+
+# target to build an object file
+test_ast.cc.o:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ast.dir/build.make tests/CMakeFiles/test_ast.dir/test_ast.cc.o
+.PHONY : test_ast.cc.o
+
+test_ast.i: test_ast.cc.i
+
+.PHONY : test_ast.i
+
+# target to preprocess a source file
+test_ast.cc.i:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ast.dir/build.make tests/CMakeFiles/test_ast.dir/test_ast.cc.i
+.PHONY : test_ast.cc.i
+
+test_ast.s: test_ast.cc.s
+
+.PHONY : test_ast.s
+
+# target to generate assembly for a file
+test_ast.cc.s:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ast.dir/build.make tests/CMakeFiles/test_ast.dir/test_ast.cc.s
+.PHONY : test_ast.cc.s
+
+test_call.o: test_call.cc.o
+
+.PHONY : test_call.o
+
+# target to build an object file
+test_call.cc.o:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_call.dir/build.make tests/CMakeFiles/test_call.dir/test_call.cc.o
+.PHONY : test_call.cc.o
+
+test_call.i: test_call.cc.i
+
+.PHONY : test_call.i
+
+# target to preprocess a source file
+test_call.cc.i:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_call.dir/build.make tests/CMakeFiles/test_call.dir/test_call.cc.i
+.PHONY : test_call.cc.i
+
+test_call.s: test_call.cc.s
+
+.PHONY : test_call.s
+
+# target to generate assembly for a file
+test_call.cc.s:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_call.dir/build.make tests/CMakeFiles/test_call.dir/test_call.cc.s
+.PHONY : test_call.cc.s
 
 test_gettok.o: test_gettok.cc.o
 
@@ -179,7 +263,15 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... test_ast"
+	@echo "... test_call"
 	@echo "... test_gettok"
+	@echo "... test_ast.o"
+	@echo "... test_ast.i"
+	@echo "... test_ast.s"
+	@echo "... test_call.o"
+	@echo "... test_call.i"
+	@echo "... test_call.s"
 	@echo "... test_gettok.o"
 	@echo "... test_gettok.i"
 	@echo "... test_gettok.s"

@@ -54,5 +54,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "core/CMakeFiles/smcc_core.dir/DependInfo.cmake"
+  "tests/CMakeFiles/test_call.dir/DependInfo.cmake"
+  "tests/CMakeFiles/test_ast.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_gettok.dir/DependInfo.cmake"
   )

@@ -356,5 +356,5 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
-__smcc_lib:INTERNAL=;reader.cc;ast.cc
+__smcc_lib:INTERNAL=;reader.cc;expr.cc;ast.cc;codegen.cc
 

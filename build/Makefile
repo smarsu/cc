@@ -143,6 +143,32 @@ smcc_core/fast:
 .PHONY : smcc_core/fast
 
 #=============================================================================
+# Target rules for targets named test_call
+
+# Build rule for target.
+test_call: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_call
+.PHONY : test_call
+
+# fast build rule for target.
+test_call/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_call.dir/build.make tests/CMakeFiles/test_call.dir/build
+.PHONY : test_call/fast
+
+#=============================================================================
+# Target rules for targets named test_ast
+
+# Build rule for target.
+test_ast: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_ast
+.PHONY : test_ast
+
+# fast build rule for target.
+test_ast/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_ast.dir/build.make tests/CMakeFiles/test_ast.dir/build
+.PHONY : test_ast/fast
+
+#=============================================================================
 # Target rules for targets named test_gettok
 
 # Build rule for target.
@@ -164,6 +190,8 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... smcc_core"
+	@echo "... test_ast"
+	@echo "... test_call"
 	@echo "... test_gettok"
 .PHONY : help
 

@@ -6,6 +6,17 @@ core/CMakeFiles/smcc_core.dir/ast.cc.o: ../core/ast.h
 core/CMakeFiles/smcc_core.dir/ast.cc.o: ../core/expr.h
 core/CMakeFiles/smcc_core.dir/ast.cc.o: ../core/reader.h
 
+core/CMakeFiles/smcc_core.dir/codegen.cc.o: ../core/ast.h
+core/CMakeFiles/smcc_core.dir/codegen.cc.o: ../core/codegen.cc
+core/CMakeFiles/smcc_core.dir/codegen.cc.o: ../core/codegen.h
+core/CMakeFiles/smcc_core.dir/codegen.cc.o: ../core/expr.h
+core/CMakeFiles/smcc_core.dir/codegen.cc.o: ../core/reader.h
+
+core/CMakeFiles/smcc_core.dir/expr.cc.o: ../core/ast.h
+core/CMakeFiles/smcc_core.dir/expr.cc.o: ../core/expr.cc
+core/CMakeFiles/smcc_core.dir/expr.cc.o: ../core/expr.h
+core/CMakeFiles/smcc_core.dir/expr.cc.o: ../core/reader.h
+
 core/CMakeFiles/smcc_core.dir/reader.cc.o: ../core/reader.cc
 core/CMakeFiles/smcc_core.dir/reader.cc.o: ../core/reader.h
 

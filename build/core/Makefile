@@ -171,6 +171,60 @@ ast.cc.s:
 	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/ast.cc.s
 .PHONY : ast.cc.s
 
+codegen.o: codegen.cc.o
+
+.PHONY : codegen.o
+
+# target to build an object file
+codegen.cc.o:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/codegen.cc.o
+.PHONY : codegen.cc.o
+
+codegen.i: codegen.cc.i
+
+.PHONY : codegen.i
+
+# target to preprocess a source file
+codegen.cc.i:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/codegen.cc.i
+.PHONY : codegen.cc.i
+
+codegen.s: codegen.cc.s
+
+.PHONY : codegen.s
+
+# target to generate assembly for a file
+codegen.cc.s:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/codegen.cc.s
+.PHONY : codegen.cc.s
+
+expr.o: expr.cc.o
+
+.PHONY : expr.o
+
+# target to build an object file
+expr.cc.o:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/expr.cc.o
+.PHONY : expr.cc.o
+
+expr.i: expr.cc.i
+
+.PHONY : expr.i
+
+# target to preprocess a source file
+expr.cc.i:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/expr.cc.i
+.PHONY : expr.cc.i
+
+expr.s: expr.cc.s
+
+.PHONY : expr.s
+
+# target to generate assembly for a file
+expr.cc.s:
+	cd /Users/smarsu/tencent/cc/smcc_201229/build && $(MAKE) $(MAKESILENT) -f core/CMakeFiles/smcc_core.dir/build.make core/CMakeFiles/smcc_core.dir/expr.cc.s
+.PHONY : expr.cc.s
+
 reader.o: reader.cc.o
 
 .PHONY : reader.o
@@ -210,6 +264,12 @@ help:
 	@echo "... ast.o"
 	@echo "... ast.i"
 	@echo "... ast.s"
+	@echo "... codegen.o"
+	@echo "... codegen.i"
+	@echo "... codegen.s"
+	@echo "... expr.o"
+	@echo "... expr.i"
+	@echo "... expr.s"
 	@echo "... reader.o"
 	@echo "... reader.i"
 	@echo "... reader.s"

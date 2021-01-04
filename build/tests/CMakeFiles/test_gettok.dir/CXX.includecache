@@ -13,8 +13,20 @@ ast.h
 ../core/ast.h
 string
 -
+map
+-
 reader.h
 ../core/reader.h
+expr.h
+../core/expr.h
+
+../core/expr.h
+vector
+-
+string
+-
+memory
+-
 
 ../core/reader.h
 cstdio

@@ -1,10 +1,31 @@
 // Copyright (c) 2020 smarsufan. All Rights Reserved.
 
 #include "ast.h"
+#include <iostream>
 #include <memory>
 #include <utility>
 
+// namespace std {
+// template <typename T>
+// using Ele = typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T> >::type;
+
+// template <typename T, typename ... Args> inline
+// Ele<T> make_unique(Args && ... args) {
+//     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+// }
+
+// }  // namespace std
+
 namespace smcc {
+
+AST::AST(Reader *reader)
+    : reader_(reader) {
+
+}
+
+AST::~AST() {
+  
+}
 
 int AST::gettok() {
   // Skip any whitespace.
@@ -20,6 +41,16 @@ int AST::gettok() {
       return tok_def;
     if (identifier_str == "extern")
       return tok_extern;
+    if (identifier_str == "if")
+      return tok_if;
+    if (identifier_str == "else")
+      return tok_else;
+    if (identifier_str == "int")
+      return tok_int;
+    if (identifier_str == "double")
+      return tok_dbl;
+    if (identifier_str == "return")
+      return tok_return;
     return tok_identifier;
   }
 
@@ -49,6 +80,62 @@ int AST::gettok() {
       return gettok();
   }
 
+  if (last_char == '<') {
+    last_char = getchar();
+    if (last_char == '=') {
+      last_char = getchar();
+
+      return tok_lessequal;
+    }
+    else {
+      return tok_less;
+    }
+  }
+
+  if (last_char == '>') {
+    last_char = getchar();
+    if (last_char == '=') {
+      last_char = getchar();
+
+      return tok_greatequal;
+    }
+    else {
+      return tok_great;
+    }
+  }
+
+  if (last_char == '=') {
+    last_char = getchar();
+    if (last_char == '=') {
+      last_char = getchar();
+
+      return tok_equal;
+    }
+    else {
+      return tok_assign;
+    }
+  }
+
+  if (last_char == '+') {
+    last_char = getchar();
+    return tok_add;
+  }
+
+  if (last_char == '-') {
+    last_char = getchar();
+    return tok_sub;
+  }
+
+  if (last_char == '*') {
+    last_char = getchar();
+    return tok_mul;
+  }
+
+  if (last_char == '/') {
+    last_char = getchar();
+    return tok_div;
+  }
+
   // Check for end of file.  Don't eat the EOF.
   if (last_char == EOF)
     return tok_eof;
@@ -60,8 +147,11 @@ int AST::gettok() {
 }
 
 int AST::GetTokPrecedence() {
-    if (!isascii(cur_tok))
+    // if (!isascii(cur_tok))
+    //   return -1;
+    if (binop_precedence.find(cur_tok) == binop_precedence.end()) {
       return -1;
+    }
 
     // Make sure it's a declared binop.
     int tok_prec = binop_precedence[cur_tok];
@@ -73,23 +163,26 @@ int AST::GetTokPrecedence() {
 void AST::parse() {
   getNextToken();
 
-  std::vector<std::unique_ptr<Expr>> exprs;
+  // std::vector<std::unique_ptr<Expr>> exprs;
 
   while (cur_tok != tok_eof) {
     if (cur_tok <= tok_dt) {
+      fprintf(stderr, "need tok type -100");
       abort();
     }
 
-    Token type = curtok();
+    // Token type = curtok();
     cur_type = curtok();
     getNextToken();  // eat type
 
     if (cur_tok != tok_identifier) {
+      fprintf(stderr, "-200");
       abort();
     }
     auto name = identifier_str;
+    getNextToken();  // eat id
     if (cur_tok == '(') {
-      getNextToken();  // eat ()
+      // getNextToken();  // eat (
       auto expr = ParseDefinition(cur_type, name);
       exprs.push_back(std::move(expr));
     }
@@ -104,14 +197,16 @@ void AST::parse() {
 
 std::unique_ptr<Expr> AST::ParseDefinition(Token def_token, const std::string &def_name) {
   if (cur_tok != '(') {
+    fprintf(stderr, "-300");
     abort();
   }
 
   getNextToken();  // eat '('
 
-  std::vector<std::unique_ptr<Expr>> args;
+  std::vector<std::unique_ptr<VarExpr>> args;
   while (cur_tok != ')') {
     if (cur_tok <= tok_dt) {
+      fprintf(stderr, "-400");
       abort();
     }
 
@@ -119,31 +214,38 @@ std::unique_ptr<Expr> AST::ParseDefinition(Token def_token, const std::string &d
     getNextToken();  // eat type
 
     if (cur_tok != tok_identifier) {
+      fprintf(stderr, "-500");
       abort();
     }
     auto name = identifier_str;
 
     auto arg = std::make_unique<VarExpr>(cur_type, name);
-    args.push_back(std::move(arg));
+    args.emplace_back(std::move(arg));
 
     getNextToken();  // eat name
     if (cur_tok != ',' && cur_tok != ')') {
+      fprintf(stderr, "-600");
       abort();
+    }
+
+    if (cur_tok == ',') {
+      getNextToken();  // eat ,
     }
   }
 
-  auto def = std::make_unique<PrototypeExpr>(def_token, def_name, args);
+  auto def = std::make_unique<PrototypeExpr>(def_token, def_name, std::move(args));
 
   getNextToken();  // eat )
 
   if (cur_tok != '{') {
+    fprintf(stderr, "-700");
     abort();
   }
 
   auto body = ParseBody();
 
-  auto func = std::make_unique<FunctionExpr>(def, body);
-  return func;
+  auto func = std::make_unique<FunctionExpr>(std::move(def), std::move(body));
+  return std::move(func);
 }
 
 std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string &name) {
@@ -156,10 +258,27 @@ std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string
 
   while (cur_tok != ';') {
     if (cur_tok != ',') {
+      fprintf(stderr, "-800");
       abort();
     }
 
-    std::unique_ptr<VarExpr> var = std::make_unique<VarExpr>(token, name);
+    getNextToken();  // eat ','
+    if (cur_tok <= tok_dt) {
+      fprintf(stderr, "-810");      
+      abort();
+    }
+
+    cur_type = curtok();
+
+    getNextToken();  // eat dt
+    if (cur_tok != tok_identifier) {
+      fprintf(stderr, "-820");      
+      abort();
+    }
+
+    auto cur_name = identifier_str;
+
+    std::unique_ptr<VarExpr> var = std::make_unique<VarExpr>(cur_type, cur_name);
     auto expr = ParseBinaryOp(0, std::move(var));
     exprs.push_back(std::move(expr));
   }
@@ -172,58 +291,80 @@ std::vector<std::unique_ptr<Expr>> AST::ParseBody() {
   getNextToken();  // eat {
   while (cur_tok != '}') {
     if (cur_tok == tok_dt) {
-      Token type = curtok();
+      // Token type = curtok();
       getNextToken();  // eat dt
       if (cur_tok != tok_identifier) {
+        fprintf(stderr, "-900");
         abort();
       }
       auto name = identifier_str;
       auto vars = ParseVars(cur_type, name);
-      exprs.insert(exprs.begin(), vars.begin(), vars.end());
+      for (auto &var : vars) {
+        exprs.push_back(std::move(var));
+      }
     }
     else if (cur_tok == tok_if) {
       auto expr = ParseIf();
       exprs.push_back(std::move(expr));
     }
+    else if (cur_tok == tok_return) {
+      getNextToken();  // eat return
+      auto expr = ParseExpression();
+      exprs.push_back(std::make_unique<ReturnExpe>(std::move(expr)));
+
+      if (cur_tok != ';') {
+        fprintf(stderr, "-910");
+        abort();
+      }
+
+      getNextToken();  // eat ;
+    }
     else {
       auto expr = ParseExpression();
       exprs.push_back(std::move(expr));
+
+      if (cur_tok != ';') {
+        fprintf(stderr, "-920");
+        abort();
+      }
+
+      getNextToken();  // eat ;
     }
   }
+
+  getNextToken();  // eat }
+  // return std::move(exprs);
   return exprs;
+
 }
 
 std::unique_ptr<Expr> AST::ParseIf() {
   getNextToken();  // eat if
   if (cur_tok != '(') {
+    fprintf(stderr, "-1000");
     abort();
   }
   // getNextToken();  // eat (
   auto cond = ParseExpression();
-  if (cur_tok != ')') {
-    abort();
-  }
-  getNextToken();  // eat )
   if (cur_tok != '{') {
+    fprintf(stderr, "-1200");
     abort();
   }
   auto body = ParseBody();
-  if (cur_tok != '}') {
-    abort();
-  }
-  getNextToken();  // eat }
   std::vector<std::unique_ptr<Expr>> other;
   if (cur_tok == tok_else) {
     getNextToken();  // eat else
     if (cur_tok == tok_if) {
-      other = std::vector<std::unique_ptr<Expr>>{ParseIf()};
+      auto expr = ParseIf();
+      other.push_back(std::move(expr));
     }
     else {
+      // other = std::move(ParseBody());
       other = ParseBody();
     }
   }
 
-  return std::make_unique<IfExpr>(cond, body, other);
+  return std::make_unique<IfExpr>(std::move(cond), std::move(body), std::move(other));
 }
 
 std::unique_ptr<Expr> AST::ParseExpression() {
@@ -251,6 +392,7 @@ std::unique_ptr<Expr> AST::ParsePrimary() {
           break;
 
         if (cur_tok != ',') {
+          fprintf(stderr, "-1400");
           abort();
         }
         getNextToken();  // eat ','
@@ -271,12 +413,14 @@ std::unique_ptr<Expr> AST::ParsePrimary() {
     getNextToken();  // eat '('
     auto expr = ParseExpression();
     if (cur_tok != ')') {
+      fprintf(stderr, "-1500");
       abort();
     }
     getNextToken();  // eat ')'
     return expr;
   }
   else {
+    fprintf(stderr, "-1600");
     abort();
   }
 }
@@ -294,6 +438,7 @@ std::unique_ptr<Expr> AST::ParseBinaryOp(int expr_prec, std::unique_ptr<Expr> lh
 
     auto rhs = ParsePrimary();
     if (!rhs) {
+      fprintf(stderr, "-1700");
       abort();
     }
 
@@ -301,6 +446,7 @@ std::unique_ptr<Expr> AST::ParseBinaryOp(int expr_prec, std::unique_ptr<Expr> lh
     if (tok_prec < next_prec) {
       rhs = ParseBinaryOp(tok_prec + 1, std::move(rhs));
       if (!rhs) {
+        fprintf(stderr, "-1800");
         abort();
       }
     }

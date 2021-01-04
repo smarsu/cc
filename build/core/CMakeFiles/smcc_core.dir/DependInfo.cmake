@@ -5,6 +5,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/smarsu/tencent/cc/smcc_201229/core/ast.cc" "/Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/smcc_core.dir/ast.cc.o"
+  "/Users/smarsu/tencent/cc/smcc_201229/core/codegen.cc" "/Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/smcc_core.dir/codegen.cc.o"
+  "/Users/smarsu/tencent/cc/smcc_201229/core/expr.cc" "/Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/smcc_core.dir/expr.cc.o"
   "/Users/smarsu/tencent/cc/smcc_201229/core/reader.cc" "/Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/smcc_core.dir/reader.cc.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")

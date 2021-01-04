@@ -3,6 +3,8 @@
 /Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/rebuild_cache.dir
 /Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/edit_cache.dir
 /Users/smarsu/tencent/cc/smcc_201229/build/core/CMakeFiles/smcc_core.dir
+/Users/smarsu/tencent/cc/smcc_201229/build/tests/CMakeFiles/test_call.dir
+/Users/smarsu/tencent/cc/smcc_201229/build/tests/CMakeFiles/test_ast.dir
 /Users/smarsu/tencent/cc/smcc_201229/build/tests/CMakeFiles/rebuild_cache.dir
 /Users/smarsu/tencent/cc/smcc_201229/build/tests/CMakeFiles/edit_cache.dir
 /Users/smarsu/tencent/cc/smcc_201229/build/tests/CMakeFiles/test_gettok.dir

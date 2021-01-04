@@ -1,5 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/smcc_core.dir/ast.cc.o"
+  "CMakeFiles/smcc_core.dir/codegen.cc.o"
+  "CMakeFiles/smcc_core.dir/expr.cc.o"
   "CMakeFiles/smcc_core.dir/reader.cc.o"
   "libsmcc_core.a"
   "libsmcc_core.pdb"

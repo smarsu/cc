@@ -3,6 +3,7 @@
 
 tests/CMakeFiles/test_gettok.dir/test_gettok.cc.o: ../core/api.h
 tests/CMakeFiles/test_gettok.dir/test_gettok.cc.o: ../core/ast.h
+tests/CMakeFiles/test_gettok.dir/test_gettok.cc.o: ../core/expr.h
 tests/CMakeFiles/test_gettok.dir/test_gettok.cc.o: ../core/reader.h
 tests/CMakeFiles/test_gettok.dir/test_gettok.cc.o: ../tests/test_gettok.cc
 

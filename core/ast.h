@@ -7,16 +7,9 @@
 #include "reader.h"
 #include "expr.h"
 
-static std::map<char, int> binop_precedence = {
-  {'<', 10},
-  {'+', 20},
-  {'-', 20},
-  {'*', 40},
-};
-
 // The lexer returns tokens [0-255] if it is an unknown character, otherwise one
 // of these for known things.
-enum Token : int {
+enum Token {
   tok_nb = -256,
   
   tok_eof,
@@ -32,10 +25,43 @@ enum Token : int {
   // sm
   tok_if,
   tok_else,
+  tok_return,
 
+  // binary
+  tok_less,
+  tok_lessequal,
+  tok_great,
+  tok_greatequal,
+  tok_equal,
+
+  tok_add,
+  tok_sub,
+  tok_mul,
+  tok_div,
+
+  tok_assign,
+
+  // dtype
   tok_dt,
   tok_int,
   tok_dbl,
+};
+
+static std::map<char, int> binop_precedence = {
+  // {'<', 10},
+  // {'+', 20},
+  // {'-', 20},
+  // {'*', 40},
+  {tok_assign, 10},
+  {tok_less, 20},
+  {tok_lessequal, 20},
+  {tok_great, 20},
+  {tok_greatequal, 20},
+  {tok_equal, 20},
+  {tok_add, 30},
+  {tok_sub, 30},
+  {tok_mul, 40},
+  {tok_div, 40},
 };
 
 typedef struct TokenInfo {
@@ -106,6 +132,8 @@ class AST {
   int cur_tok{0};
 
   Token cur_type{tok_dt};
+
+  std::vector<std::unique_ptr<Expr>> exprs;
 };
 
 }  // namespace smcc
