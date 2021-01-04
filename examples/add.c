@@ -1,11 +1,11 @@
 double add(double pos, double size) {
   if (pos < 0.3 * size) {
-    return 0.5;
+    return 0.3;
   }
-  else if (pos < 0.7 * size) {
+  else if (pos < 0.9 * size) {
     return 1;
   }
   else {
-    return 0.5;
+    return (size - pos) / size;
   }
 }

@@ -69,7 +69,7 @@ int AST::gettok() {
     // Comment until end of line.
     last_char = getchar();
     if (last_char != '/') {
-      return '/';
+      return tok_div;
     }
 
     do
@@ -129,11 +129,6 @@ int AST::gettok() {
   if (last_char == '*') {
     last_char = getchar();
     return tok_mul;
-  }
-
-  if (last_char == '/') {
-    last_char = getchar();
-    return tok_div;
   }
 
   // Check for end of file.  Don't eat the EOF.

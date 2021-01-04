@@ -22,7 +22,7 @@ int main(int argv, char *args[]) {
   ast.parse();
 
   smcc::reset();
-  auto v = smcc::call("add", {8000., 16000.});
+  auto v = smcc::call("add", {15000., 16000.});
 
   fprintf(stderr, "%f\n", v);  
 
