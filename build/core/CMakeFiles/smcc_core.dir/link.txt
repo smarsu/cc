@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libsmcc_core.a CMakeFiles/smcc_core.dir/reader.cc.o CMakeFiles/smcc_core.dir/expr.cc.o CMakeFiles/smcc_core.dir/ast.cc.o CMakeFiles/smcc_core.dir/codegen.cc.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libsmcc_core.a
