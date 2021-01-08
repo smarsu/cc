@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <map>
+#include <cmath>
 
 #include "expr.h"
 #include "ast.h"
@@ -35,6 +36,7 @@ double call(const std::string &func_id, const std::vector<double> &args) {
     return stack[index];
   }
   else {
+    fprintf(stderr, "expr -1000\n");
     abort();
   }
 }
@@ -98,6 +100,7 @@ int VarExpr::run() {
   if (vars.find(name_) != vars.end()) {
     // Found It
     if (token_ != tok_dt) {
+      fprintf(stderr, "expr -2000\n");
       abort();
     }
     this_stack_idx = vars[name_]->this_stack_idx;
@@ -105,6 +108,7 @@ int VarExpr::run() {
   else {
     // Not Found
     if (token_ <= tok_dt) {
+      fprintf(stderr, "expr -3000\n");
       abort();
     }
     vars[name_] = this;
@@ -136,7 +140,7 @@ int BinaryExpr::run() {
 
   switch (tok_) {
     default:
-      fprintf(stderr, "-10000000 %d\n", tok_);
+      fprintf(stderr, "expr -4000\n");
       abort();
 
     case tok_less:
@@ -188,18 +192,35 @@ CallExpr::CallExpr(std::string id, std::vector<std::unique_ptr<Expr>> args)
 }
 
 int CallExpr::run() {
+  this_stack_idx = ++stack_idx;
+
   if (funcs.find(id_) != funcs.end()) {
     for (int idx = 0; idx < args_.size(); ++idx) {
       int proto_index = funcs[id_]->proto_->args_[idx]->this_stack_idx;
       stack[proto_index] = args_[idx]->run();
     }
-    funcs[id_]->run();
+    int idx = funcs[id_]->run();
+    stack[this_stack_idx] = stack[idx];
+  }
+  else if (id_ == "sqrt") {
+    // The args have not been run this time, so we should run it.
+    double value = std::sqrt(stack[args_[0]->run()]);
+    stack[this_stack_idx] = value;
+  }
+  else if (id_ == "sin") {
+    double value = std::sin(stack[args_[0]->run()]);
+    stack[this_stack_idx] = value;
+  }
+  else if (id_ == "pow") {
+    double value = std::pow(stack[args_[0]->run()], stack[args_[1]->run()]);
+    stack[this_stack_idx] = value;
   }
   else {
+    fprintf(stderr, "expr -5000: %s\n", id_.c_str());
     abort();
   }
 
-  return funcs[id_]->this_stack_idx;
+  return this_stack_idx;
 }
 
 ReturnExpe::ReturnExpe(std::unique_ptr<Expr> expr)

@@ -370,7 +370,7 @@ std::unique_ptr<Expr> AST::ParseExpression() {
 std::unique_ptr<Expr> AST::ParsePrimary() {
   if (cur_tok == tok_identifier) {
     // ParseIdentifierExpr
-    auto &name = identifier_str;
+    auto name = identifier_str;
     getNextToken(); // eat id
     if (cur_tok != '(') {
       return std::make_unique<VarExpr>(tok_dt, name);
