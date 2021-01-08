@@ -1,6 +1,10 @@
+double add(double x, double y) {
+  return x + y;
+}
+
 double main(double pos, double size) {
   if (pos < 0.3 * size) {
-    return sqrt(0.3);
+    return sqrt(add(0.3, 1));
   }
   else if (pos < 0.9 * size) {
     return sin(0.3);

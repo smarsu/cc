@@ -196,8 +196,8 @@ int CallExpr::run() {
 
   if (funcs.find(id_) != funcs.end()) {
     for (int idx = 0; idx < args_.size(); ++idx) {
-      int proto_index = funcs[id_]->proto_->args_[idx]->this_stack_idx;
-      stack[proto_index] = args_[idx]->run();
+      int proto_index = funcs[id_]->proto_->args_[idx]->run();
+      stack[proto_index] = stack[args_[idx]->run()];
     }
     int idx = funcs[id_]->run();
     stack[this_stack_idx] = stack[idx];
