@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <map>
 
 // #include "ast.h"
 
@@ -20,8 +21,10 @@ class Expr {
 
   virtual int run() = 0;
 
- public:
-  int this_stack_idx = -1;
+  virtual int this_stack_idx() { return this_stack_idx_; }
+
+ protected:
+  int this_stack_idx_ = -1;
 };
 
 class VarExpr : public Expr {
@@ -30,9 +33,12 @@ class VarExpr : public Expr {
 
   virtual int run();
 
+  virtual int this_stack_idx();
+
  public:
   int token_;
   std::string name_;
+  std::map<int, int> prefix_to_index_;
 };
 
 class PrototypeExpr : public Expr {

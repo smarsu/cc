@@ -162,7 +162,7 @@ void AST::parse() {
 
   while (cur_tok != tok_eof) {
     if (cur_tok <= tok_dt) {
-      fprintf(stderr, "need tok type -100");
+      fprintf(stderr, "-100");
       abort();
     }
 
