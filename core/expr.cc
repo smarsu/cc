@@ -168,6 +168,31 @@ IRValue *IfExpr::codegen() {
   return nullptr;
 }
 
+WhileExpr::WhileExpr(std::unique_ptr<Expr> cond, std::unique_ptr<Expr> body) 
+    : cond_(std::move(cond)), body_(std::move(body)) {
+}
+
+int WhileExpr::run() {
+  return -1;
+}
+
+IRValue *WhileExpr::codegen() {
+  int pos_while = Builder.fuction()->op_size();
+  auto *value = cond_->codegen();
+  int block_if;
+  int block_else;
+  Builder.fuction()->CreateIf(value, &block_if, &block_else);
+  int pos_if = Builder.fuction()->op_size();
+  body_->codegen();
+  int block_while;
+  Builder.fuction()->CreateGoto(&block_while);
+  int pos_else = Builder.fuction()->op_size();
+  Builder.fuction()->setGoto(block_if, pos_if);
+  Builder.fuction()->setGoto(block_else, pos_else);
+  Builder.fuction()->setGoto(block_while, pos_while);
+  return nullptr;
+}
+
 VarExpr::VarExpr(int token, std::string name)
     : token_(token), name_(name) {  // It's danger to move.
 }
@@ -208,6 +233,18 @@ IRValue *VarExpr::codegen() {
   return value;
 }
 
+SubVarExpr::SubVarExpr(std::string name, int index) 
+    : name_(name), index_(index) {
+}
+
+int SubVarExpr::run() {
+  return -1;
+}
+
+IRValue *SubVarExpr::codegen() {
+  return Builder.fuction()->CreateSubValue(name_, index_);
+}
+
 NumberExpr::NumberExpr(double num_val)
     : num_val_(num_val) {
 }
@@ -220,6 +257,18 @@ int NumberExpr::run() {
 
 IRValue *NumberExpr::codegen() {
   return Builder.fuction()->CreateNumber(num_val_);
+}
+
+ListExpr::ListExpr(std::string name, std::vector<double> num_vals)
+    : name_(name), num_vals_(std::move(num_vals)) {
+}
+
+int ListExpr::run() {
+  return -1;
+}
+
+IRValue *ListExpr::codegen() {
+  return Builder.fuction()->CreateList(name_, num_vals_);
 }
 
 BinaryExpr::BinaryExpr(int tok, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs)

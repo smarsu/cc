@@ -51,6 +51,8 @@ int AST::gettok() {
       return tok_dbl;
     if (identifier_str == "return")
       return tok_return;
+    if (identifier_str == "while")
+      return tok_while;
     return tok_identifier;
   }
 
@@ -249,6 +251,53 @@ std::unique_ptr<Expr> AST::ParseDefinition(Token def_token, const std::string &d
   return std::move(func);
 }
 
+std::unique_ptr<Expr> AST::ParseInitList(std::string name) {
+  getNextToken();  // eat [
+  if (cur_tok != tok_number) {
+    fprintf(stderr, "-710");   
+    abort();
+  }
+  int64_t num = num_val;
+  getNextToken();  // eat tok_number
+  if (cur_tok != ']') {
+    fprintf(stderr, "-720");  
+    abort();
+  }
+  getNextToken();  // eat ]
+  if (cur_tok != tok_assign) {
+    fprintf(stderr, "-730 %d %c\n", cur_tok, cur_tok);  
+    abort();
+  }
+  getNextToken();  // eat =
+  if (cur_tok != '{') {
+    fprintf(stderr, "-740");  
+    abort();
+  }
+  getNextToken();  // eat {
+  std::vector<double> exprs;
+  while (cur_tok != '}') {
+    if (cur_tok != tok_number) {
+      fprintf(stderr, "-750");  
+      abort();
+    }
+    exprs.push_back(num_val);
+
+    getNextToken();  // eat tok_number
+    if (cur_tok == ',') {
+      getNextToken();  // eat ,
+    }
+  }
+
+  getNextToken();  // eat }
+
+  if (num != exprs.size()) {
+    fprintf(stderr, "-760");  
+    abort();
+  }
+  
+  return std::make_unique<ListExpr>(name, exprs);
+}
+
 std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string &name) {
   std::unique_ptr<VarExpr> var = std::make_unique<VarExpr>(token, name);
 
@@ -256,8 +305,14 @@ std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string
 
   getNextToken();  // eat identifier
 
-  auto expr = ParseBinaryOp(0, std::move(var));
-  exprs.push_back(std::move(expr));
+  if (cur_tok == '[') {
+    auto expr = ParseInitList(name);
+    exprs.push_back(std::move(expr));
+  }
+  else {
+    auto expr = ParseBinaryOp(0, std::move(var));
+    exprs.push_back(std::move(expr));
+  }
 
   while (cur_tok != ';') {
     if (cur_tok != ',') {
@@ -282,8 +337,16 @@ std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string
     auto cur_name = identifier_str;
 
     std::unique_ptr<VarExpr> var = std::make_unique<VarExpr>(cur_type, cur_name);
-    auto expr = ParseBinaryOp(0, std::move(var));
-    exprs.push_back(std::move(expr));
+    // auto expr = ParseBinaryOp(0, std::move(var));
+    // exprs.push_back(std::move(expr));
+    if (cur_tok == '[') {
+      auto expr = ParseInitList(cur_name);
+      exprs.push_back(std::move(expr));
+    }
+    else {
+      auto expr = ParseBinaryOp(0, std::move(var));
+      exprs.push_back(std::move(expr));
+    }
   }
 
   return exprs;
@@ -310,6 +373,10 @@ std::unique_ptr<BodyExpr> AST::ParseBody() {
     }
     else if (cur_tok == tok_if) {
       auto expr = ParseIf();
+      exprs.push_back(std::move(expr));
+    }
+    else if (cur_tok == tok_while) {
+      auto expr = ParseWhile();
       exprs.push_back(std::move(expr));
     }
     else if (cur_tok == tok_return) {
@@ -373,6 +440,23 @@ std::unique_ptr<Expr> AST::ParseIf() {
   return std::make_unique<IfExpr>(std::move(cond), std::move(body), std::move(other));
 }
 
+std::unique_ptr<Expr> AST::ParseWhile() {
+  getNextToken();  // eat while
+  if (cur_tok != '(') {
+    fprintf(stderr, "-1000");
+    abort();
+  }
+  // getNextToken();  // eat (
+  auto cond = ParseExpression();
+  if (cur_tok != '{') {
+    fprintf(stderr, "-1200");
+    abort();
+  }
+  auto body = ParseBody();
+
+  return std::make_unique<WhileExpr>(std::move(cond), std::move(body));
+}
+
 std::unique_ptr<Expr> AST::ParseExpression() {
   auto lhs = ParsePrimary();
   return ParseBinaryOp(0, std::move(lhs));
@@ -384,6 +468,20 @@ std::unique_ptr<Expr> AST::ParsePrimary() {
     auto name = identifier_str;
     getNextToken(); // eat id
     if (cur_tok != '(') {
+      if (cur_tok == '[') {
+        getNextToken(); // eat [
+        if (cur_tok != tok_number) {
+          abort();
+        }
+        int index = num_val;
+        getNextToken(); // eat tok_number
+        if (cur_tok != ']') {
+          abort();
+        }
+        getNextToken(); // eat ]
+        return std::make_unique<SubVarExpr>(name, index);
+      }
+
       return std::make_unique<VarExpr>(tok_dt, name);
     }
 

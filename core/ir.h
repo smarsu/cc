@@ -398,6 +398,10 @@ class IRFunction {
 
   IRValue *CreateRet(IRValue *value);
 
+  IRValue *CreateList(std::string name, std::vector<double> values);
+
+  IRValue *CreateSubValue(std::string name, int index);
+
   std::string toString();
 
  private:
@@ -414,6 +418,7 @@ class IRFunction {
   std::vector<std::unique_ptr<IROp>> ops;
   std::vector<std::unique_ptr<IRValue>> values;
   std::map<int, int> goto_map;
+  std::map<std::string, std::vector<double>> name_to_list;
   std::map<std::string, IRValue *> name_to_value;  // Need to restore when goto end of body.
   int this_id{0};
   int this_block{0};

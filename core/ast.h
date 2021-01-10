@@ -26,6 +26,7 @@ enum Token {
   tok_if,
   tok_else,
   tok_return,
+  tok_while,
 
   // binary
   tok_less,
@@ -116,7 +117,11 @@ class AST {
 
   std::unique_ptr<Expr> ParseIf();
 
+  std::unique_ptr<Expr> ParseWhile();
+
   std::unique_ptr<Expr> ParsePrimary();
+
+  std::unique_ptr<Expr> ParseInitList(std::string name);
 
   std::vector<std::unique_ptr<Expr>> ParseVars(Token token, const std::string &name);
 

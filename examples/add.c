@@ -19,16 +19,28 @@
 //   return a + b;
 // }
 
-double main(double pos, double size) {
-  if (pos < 0.3 * size) {
-    return sqrt(pos / 0.3 * size);
+// double main(double pos, double size) {
+//   double list[2] = {0.3, 0.7};  // 支持列表初始化
+
+//   if (pos < list[0] * size) {
+//     return sqrt(pos / 0.3 * size);
+//   }
+//   else if (pos < list[1] * size) {
+//     return 1;
+//   }
+//   else {
+//     return sqrt((size - pos) / (0.3 * size));
+//   }
+// }
+
+double main(double pos, int loop) {
+  int i = 0;
+  double ret = 0;
+  while (i < loop) {
+    ret = ret + pos;
+    i = i + 1;
   }
-  else if (pos < 0.7 * size) {
-    return 1;
-  }
-  else {
-    return sqrt((size - pos) / (0.3 * size));
-  }
+  return ret;
 }
 
 // double main(double pos, double size) {

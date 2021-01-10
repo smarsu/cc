@@ -233,6 +233,23 @@ IRValue *IRFunction::CreateRet(IRValue *value) {
   return value;
 }
 
+IRValue *IRFunction::CreateList(std::string name, std::vector<double> values) {
+  // name_to_list[name] = values;
+  for (int i = 0; i < values.size(); ++i) {
+    auto value = CreateValue(name + std::to_string(i) + "]", true);
+    auto c = CreateNumber(values[i]);
+    CreateBinary(value, c, tok_assign);
+  }
+  return nullptr;
+}
+
+IRValue *IRFunction::CreateSubValue(std::string name, int index) {
+  // if (name_to_list.find(name) == name_to_list.end()) {
+  //   abort();
+  // }
+  return CreateValue(name + std::to_string(index) + "]", false);
+}
+
 IROp::IROp(int op, std::vector<IRValue *> values)
     : op_(op), values_(std::move(values)) {
 }

@@ -49,6 +49,22 @@ class VarExpr : public Expr {
   std::map<int, int> prefix_to_index_;
 };
 
+class SubVarExpr : public Expr {
+ public:
+  SubVarExpr(std::string name, int index);
+
+  virtual int run();
+
+  virtual IRValue *codegen();
+
+  // virtual int this_stack_idx();
+
+ public:
+  std::string name_;
+  int index_;
+  // std::map<int, int> prefix_to_index_;
+};
+
 class PrototypeExpr : public Expr {
  public:
   PrototypeExpr(int token, std::string name, std::vector<std::unique_ptr<VarExpr>> args);
@@ -102,6 +118,19 @@ class IfExpr : public Expr {
   std::unique_ptr<Expr> other_;
 };
 
+class WhileExpr : public Expr {
+ public:
+  WhileExpr(std::unique_ptr<Expr> cond, std::unique_ptr<Expr> body);
+
+  virtual int run();
+
+  virtual IRValue *codegen();
+
+ public:
+  std::unique_ptr<Expr> cond_;
+  std::unique_ptr<Expr> body_;
+};
+
 class NumberExpr : public Expr {
  public:
   NumberExpr(double num_val);
@@ -112,6 +141,19 @@ class NumberExpr : public Expr {
 
  public:
   double num_val_;
+};
+
+class ListExpr : public Expr {
+ public:
+  ListExpr(std::string name, std::vector<double> num_vals);
+
+  virtual int run();
+
+  virtual IRValue *codegen();
+
+ public:
+  std::string name_;
+  std::vector<double> num_vals_;
 };
 
 class BinaryExpr : public Expr {
