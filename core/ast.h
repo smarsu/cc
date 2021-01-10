@@ -93,6 +93,8 @@ class AST {
   // get a tok.
   int gettok();
 
+  void codegen();
+
   void parse();
 
   Token curtok() { return static_cast<Token>(cur_tok); }
@@ -110,7 +112,7 @@ class AST {
 
   std::unique_ptr<Expr> ParseDefinition(Token token, const std::string &name);
 
-  std::vector<std::unique_ptr<Expr>> ParseBody();
+  std::unique_ptr<BodyExpr> ParseBody();
 
   std::unique_ptr<Expr> ParseIf();
 
