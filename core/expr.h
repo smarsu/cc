@@ -6,12 +6,16 @@
 #include <memory>
 #include <map>
 
+#include "ir.h"
+
 // #include "ast.h"
 
 namespace smcc {
 
 void reset();
 double call(const std::string &func_id, const std::vector<double> &args);
+
+IRBuilder *ir_builder();
 
 class Expr {
  public:
@@ -20,6 +24,8 @@ class Expr {
   virtual ~Expr() = default;
 
   virtual int run() = 0;
+
+  virtual IRValue *codegen() = 0;
 
   virtual int this_stack_idx() { return this_stack_idx_; }
 
@@ -32,6 +38,8 @@ class VarExpr : public Expr {
   VarExpr(int token, std::string name);
 
   virtual int run();
+
+  virtual IRValue *codegen();
 
   virtual int this_stack_idx();
 
@@ -47,33 +55,51 @@ class PrototypeExpr : public Expr {
 
   virtual int run();
 
+  virtual IRValue *codegen();
+
  public:
   int token_;
   std::string name_;
   std::vector<std::unique_ptr<VarExpr>> args_;
 };
 
-class FunctionExpr : public Expr {
+class BodyExpr : public Expr {
  public:
-  FunctionExpr(std::unique_ptr<PrototypeExpr> proto, std::vector<std::unique_ptr<Expr>> body);
+  BodyExpr(std::vector<std::unique_ptr<Expr>> body);
 
   virtual int run();
 
+  virtual IRValue *codegen();
+
+ public:
+  std::vector<std::unique_ptr<Expr>> body_;
+};
+
+class FunctionExpr : public Expr {
+ public:
+  FunctionExpr(std::unique_ptr<PrototypeExpr> proto, std::unique_ptr<BodyExpr> body);
+
+  virtual int run();
+
+  virtual IRValue *codegen();
+
  public:
   std::unique_ptr<PrototypeExpr> proto_;
-  std::vector<std::unique_ptr<Expr>> body_;
+  std::unique_ptr<BodyExpr> body_;
 };
 
 class IfExpr : public Expr {
  public:
-  IfExpr(std::unique_ptr<Expr> cond, std::vector<std::unique_ptr<Expr>> body, std::vector<std::unique_ptr<Expr>> other);
+  IfExpr(std::unique_ptr<Expr> cond, std::unique_ptr<Expr> body, std::unique_ptr<Expr> other);
 
   virtual int run();
 
+  virtual IRValue *codegen();
+
  public:
   std::unique_ptr<Expr> cond_;
-  std::vector<std::unique_ptr<Expr>> body_;
-  std::vector<std::unique_ptr<Expr>> other_;
+  std::unique_ptr<Expr> body_;
+  std::unique_ptr<Expr> other_;
 };
 
 class NumberExpr : public Expr {
@@ -81,6 +107,8 @@ class NumberExpr : public Expr {
   NumberExpr(double num_val);
 
   virtual int run();
+
+  virtual IRValue *codegen();
 
  public:
   double num_val_;
@@ -91,6 +119,8 @@ class BinaryExpr : public Expr {
   BinaryExpr(int tok, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
 
   virtual int run();
+
+  virtual IRValue *codegen();
 
  public:
   int tok_;
@@ -104,6 +134,8 @@ class CallExpr : public Expr {
 
   virtual int run();
 
+  virtual IRValue *codegen();
+
  public:
   std::string id_;
   std::vector<std::unique_ptr<Expr>> args_;
@@ -114,6 +146,8 @@ class ReturnExpe : public Expr {
   ReturnExpe(std::unique_ptr<Expr> expr);
 
   virtual int run();
+
+  virtual IRValue *codegen();
 
  public:
   std::unique_ptr<Expr> expr_;

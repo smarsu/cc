@@ -9,6 +9,8 @@
 
 namespace smcc {
 
+static IRBuilder Builder;
+
 std::vector<double> stack(8 * 1024 * 1024);
 
 int prefix = 0;
@@ -44,16 +46,8 @@ double call(const std::string &func_id, const std::vector<double> &args) {
   }
 }
 
-int runExprs(const std::vector<std::unique_ptr<Expr>> &body) {
-  int isFind = find_return;
-  int index = -1;
-  for (auto &b : body) {
-    index = b->run();
-    if (isFind != find_return) {
-      break;
-    }
-  }
-  return index;
+IRBuilder *ir_builder() {
+  return &Builder;
 }
 
 PrototypeExpr::PrototypeExpr(int token, std::string name, std::vector<std::unique_ptr<VarExpr>> args)
@@ -67,7 +61,36 @@ int PrototypeExpr::run() {
   return -1;
 }
 
-FunctionExpr::FunctionExpr(std::unique_ptr<PrototypeExpr> proto, std::vector<std::unique_ptr<Expr>> body)
+IRValue *PrototypeExpr::codegen() {
+  return nullptr;
+}
+
+BodyExpr::BodyExpr(std::vector<std::unique_ptr<Expr>> body)
+    : body_(std::move(body)) {
+}
+
+int BodyExpr::run() {
+  int isFind = find_return;
+  int index = -1;
+  for (auto &b : body_) {
+    index = b->run();
+    if (isFind != find_return) {
+      break;
+    }
+  }
+  return index;
+}
+
+IRValue *BodyExpr::codegen() {
+  int id = Builder.id();
+  for (auto &body : body_) {
+    body->codegen();
+  }
+  Builder.setId(id);  // It will erase the var in the loop
+  return nullptr;
+}
+
+FunctionExpr::FunctionExpr(std::unique_ptr<PrototypeExpr> proto, std::unique_ptr<BodyExpr> body)
     : proto_(std::move(proto)), body_(std::move(body)) {
   funcs[proto_->name_] = this;
 }
@@ -79,13 +102,27 @@ int FunctionExpr::run() {
   //     break;
   //   }
   // }
-  this_stack_idx_ = runExprs(body_);
+  // this_stack_idx_ = runExprs(body_);
+  body_->run();
   // find_return = false;
   --find_return;
   return this_stack_idx_;
 }
 
-IfExpr::IfExpr(std::unique_ptr<Expr> cond, std::vector<std::unique_ptr<Expr>> body, std::vector<std::unique_ptr<Expr>> other)
+IRValue *FunctionExpr::codegen() {
+  std::vector<std::string> args_name_(proto_->args_.size());
+  for (int i = 0; i < proto_->args_.size(); ++i) {
+    args_name_[i] = proto_->args_[i]->name_;
+  }
+  Builder.addFunction(proto_->name_, args_name_);
+  // for (auto &body : body_) {
+  //   body->codegen();
+  // }
+  body_->codegen();
+  return nullptr;
+}
+
+IfExpr::IfExpr(std::unique_ptr<Expr> cond, std::unique_ptr<Expr> body, std::unique_ptr<Expr> other)
     : cond_(std::move(cond)), body_(std::move(body)), other_(std::move(other)) {
 }
 
@@ -97,7 +134,8 @@ int IfExpr::run() {
     //     break;
     //   }
     // }
-    this_stack_idx_ = runExprs(body_);
+    // this_stack_idx_ = runExprs(body_);
+    body_->run();
   }
   else {
     // for (auto &o : other_) {
@@ -106,9 +144,28 @@ int IfExpr::run() {
     //     break;
     //   }
     // }
-    this_stack_idx_ = runExprs(other_);
+    // this_stack_idx_ = runExprs(other_);
+    other_->run();
   }
   return this_stack_idx_;
+}
+
+IRValue *IfExpr::codegen() {
+  auto *value = cond_->codegen();
+  int block_if;
+  int block_else;
+  Builder.fuction()->CreateIf(value, &block_if, &block_else);
+  int pos_if = Builder.fuction()->op_size();
+  body_->codegen();
+  int block_end;
+  Builder.fuction()->CreateGoto(&block_end);
+  int pos_else = Builder.fuction()->op_size();
+  if (other_) other_->codegen();
+  int pos_end = Builder.fuction()->op_size();
+  Builder.fuction()->setGoto(block_if, pos_if);
+  Builder.fuction()->setGoto(block_else, pos_else);
+  Builder.fuction()->setGoto(block_end, pos_end);
+  return nullptr;
 }
 
 VarExpr::VarExpr(int token, std::string name)
@@ -146,6 +203,11 @@ int VarExpr::run() {
   return prefix_to_index_[prefix];
 }
 
+IRValue *VarExpr::codegen() {
+  auto value = Builder.fuction()->CreateValue(name_, token_ != tok_dt);
+  return value;
+}
+
 NumberExpr::NumberExpr(double num_val)
     : num_val_(num_val) {
 }
@@ -154,6 +216,10 @@ int NumberExpr::run() {
   this_stack_idx_ = ++stack_idx;
   stack[this_stack_idx_] = num_val_;
   return this_stack_idx_;
+}
+
+IRValue *NumberExpr::codegen() {
+  return Builder.fuction()->CreateNumber(num_val_);
 }
 
 BinaryExpr::BinaryExpr(int tok, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs)
@@ -215,6 +281,11 @@ int BinaryExpr::run() {
   return this_stack_idx_;
 }
 
+IRValue *BinaryExpr::codegen() {
+  auto value = Builder.fuction()->CreateBinary(lhs_->codegen(), rhs_->codegen(), tok_);
+  return value;
+}
+
 CallExpr::CallExpr(std::string id, std::vector<std::unique_ptr<Expr>> args)
     : id_(id), args_(std::move(args)) {
 }
@@ -258,6 +329,14 @@ int CallExpr::run() {
   return this_stack_idx_;
 }
 
+IRValue *CallExpr::codegen() {
+  std::vector<IRValue *> args(args_.size());
+  for (int i = 0; i < args_.size(); ++i) {
+    args[i] = args_[i]->codegen();
+  }
+  return Builder.fuction()->CreateCall(id_, args);
+}
+
 ReturnExpe::ReturnExpe(std::unique_ptr<Expr> expr)
     : expr_(std::move(expr)) {
 }
@@ -266,6 +345,11 @@ int ReturnExpe::run() {
   // find_return = true;
   ++find_return;
   return expr_->run();
+}
+
+IRValue *ReturnExpe::codegen() {
+  return Builder.fuction()->CreateRet(expr_->codegen());
+  // return nullptr;
 }
 
 }  // namespace smcc
