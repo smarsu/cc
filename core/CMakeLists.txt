@@ -7,6 +7,7 @@ endfunction()
 
 smcc_library(reader reader.cc)
 smcc_library(expr expr.cc)
+smcc_library(ir ir.cc)
 smcc_library(ast ast.cc)
 smcc_library(codegen codegen.cc)
 

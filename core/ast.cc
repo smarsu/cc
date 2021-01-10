@@ -155,6 +155,12 @@ int AST::GetTokPrecedence() {
     return tok_prec;
 }
 
+void AST::codegen() {
+  for (auto &expr : exprs) {
+    expr->codegen();
+  }
+}
+
 void AST::parse() {
   getNextToken();
 
@@ -248,12 +254,14 @@ std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string
 
   std::vector<std::unique_ptr<Expr>> exprs;
 
+  getNextToken();  // eat identifier
+
   auto expr = ParseBinaryOp(0, std::move(var));
   exprs.push_back(std::move(expr));
 
   while (cur_tok != ';') {
     if (cur_tok != ',') {
-      fprintf(stderr, "-800");
+      fprintf(stderr, "-800 %d %c\n", cur_tok, cur_tok);
       abort();
     }
 
@@ -281,11 +289,12 @@ std::vector<std::unique_ptr<Expr>> AST::ParseVars(Token token, const std::string
   return exprs;
 }
 
-std::vector<std::unique_ptr<Expr>> AST::ParseBody() {
+// std::vector<std::unique_ptr<Expr>> AST::ParseBody() {
+std::unique_ptr<BodyExpr> AST::ParseBody() {
   std::vector<std::unique_ptr<Expr>> exprs;
   getNextToken();  // eat {
   while (cur_tok != '}') {
-    if (cur_tok == tok_dt) {
+    if (cur_tok > tok_dt) {
       // Token type = curtok();
       getNextToken();  // eat dt
       if (cur_tok != tok_identifier) {
@@ -294,6 +303,7 @@ std::vector<std::unique_ptr<Expr>> AST::ParseBody() {
       }
       auto name = identifier_str;
       auto vars = ParseVars(cur_type, name);
+      getNextToken();  // eat ;
       for (auto &var : vars) {
         exprs.push_back(std::move(var));
       }
@@ -329,8 +339,8 @@ std::vector<std::unique_ptr<Expr>> AST::ParseBody() {
 
   getNextToken();  // eat }
   // return std::move(exprs);
-  return exprs;
-
+  // return exprs;
+  return std::make_unique<BodyExpr>(std::move(exprs));
 }
 
 std::unique_ptr<Expr> AST::ParseIf() {
@@ -346,12 +356,13 @@ std::unique_ptr<Expr> AST::ParseIf() {
     abort();
   }
   auto body = ParseBody();
-  std::vector<std::unique_ptr<Expr>> other;
+  std::unique_ptr<Expr> other;
   if (cur_tok == tok_else) {
     getNextToken();  // eat else
     if (cur_tok == tok_if) {
       auto expr = ParseIf();
-      other.push_back(std::move(expr));
+      // other.push_back(std::move(expr));
+      other = std::move(expr);
     }
     else {
       // other = std::move(ParseBody());
@@ -415,7 +426,7 @@ std::unique_ptr<Expr> AST::ParsePrimary() {
     return expr;
   }
   else {
-    fprintf(stderr, "-1600");
+    fprintf(stderr, "-1600 %d %c\n", cur_tok, cur_tok);
     abort();
   }
 }
