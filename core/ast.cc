@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <sstream>
 
 // namespace std {
 // template <typename T>
@@ -155,6 +156,14 @@ int AST::GetTokPrecedence() {
     if (tok_prec <= 0)
       return -1;
     return tok_prec;
+}
+
+std::string AST::toString() {
+  std::stringstream ss;
+  for (auto &expr : exprs) {
+    ss << expr->toString(0);
+  }
+  return ss.str();
 }
 
 void AST::codegen() {

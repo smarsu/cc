@@ -29,6 +29,8 @@ class Expr {
 
   virtual int this_stack_idx() { return this_stack_idx_; }
 
+  virtual std::string toString(int depth) = 0;
+
  protected:
   int this_stack_idx_ = -1;
 };
@@ -42,6 +44,8 @@ class VarExpr : public Expr {
   virtual IRValue *codegen();
 
   virtual int this_stack_idx();
+
+  std::string toString(int depth);
 
  public:
   int token_;
@@ -58,6 +62,7 @@ class SubVarExpr : public Expr {
   virtual IRValue *codegen();
 
   // virtual int this_stack_idx();
+  std::string toString(int depth);
 
  public:
   std::string name_;
@@ -73,6 +78,8 @@ class PrototypeExpr : public Expr {
 
   virtual IRValue *codegen();
 
+  std::string toString(int depth);
+
  public:
   int token_;
   std::string name_;
@@ -87,6 +94,8 @@ class BodyExpr : public Expr {
 
   virtual IRValue *codegen();
 
+  std::string toString(int depth);
+
  public:
   std::vector<std::unique_ptr<Expr>> body_;
 };
@@ -98,6 +107,8 @@ class FunctionExpr : public Expr {
   virtual int run();
 
   virtual IRValue *codegen();
+
+  std::string toString(int depth);
 
  public:
   std::unique_ptr<PrototypeExpr> proto_;
@@ -111,6 +122,8 @@ class IfExpr : public Expr {
   virtual int run();
 
   virtual IRValue *codegen();
+
+  std::string toString(int depth);
 
  public:
   std::unique_ptr<Expr> cond_;
@@ -126,6 +139,8 @@ class WhileExpr : public Expr {
 
   virtual IRValue *codegen();
 
+  std::string toString(int depth);
+
  public:
   std::unique_ptr<Expr> cond_;
   std::unique_ptr<Expr> body_;
@@ -139,6 +154,8 @@ class NumberExpr : public Expr {
 
   virtual IRValue *codegen();
 
+  std::string toString(int depth);
+
  public:
   double num_val_;
 };
@@ -150,6 +167,8 @@ class ListExpr : public Expr {
   virtual int run();
 
   virtual IRValue *codegen();
+
+  std::string toString(int depth);
 
  public:
   std::string name_;
@@ -163,6 +182,8 @@ class BinaryExpr : public Expr {
   virtual int run();
 
   virtual IRValue *codegen();
+
+  std::string toString(int depth);
 
  public:
   int tok_;
@@ -178,6 +199,8 @@ class CallExpr : public Expr {
 
   virtual IRValue *codegen();
 
+  std::string toString(int depth);
+
  public:
   std::string id_;
   std::vector<std::unique_ptr<Expr>> args_;
@@ -190,6 +213,8 @@ class ReturnExpe : public Expr {
   virtual int run();
 
   virtual IRValue *codegen();
+
+  std::string toString(int depth);
 
  public:
   std::unique_ptr<Expr> expr_;

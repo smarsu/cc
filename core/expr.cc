@@ -3,6 +3,7 @@
 #include <utility>
 #include <map>
 #include <cmath>
+#include <sstream>
 
 #include "expr.h"
 #include "ast.h"
@@ -65,6 +66,16 @@ IRValue *PrototypeExpr::codegen() {
   return nullptr;
 }
 
+std::string PrototypeExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << name_;
+  ss << "\n";
+  return ss.str();
+}
+
 BodyExpr::BodyExpr(std::vector<std::unique_ptr<Expr>> body)
     : body_(std::move(body)) {
 }
@@ -88,6 +99,14 @@ IRValue *BodyExpr::codegen() {
   }
   Builder.setId(id);  // It will erase the var in the loop
   return nullptr;
+}
+
+std::string BodyExpr::toString(int depth) {
+  std::stringstream ss;
+  for (auto &expr : body_) {
+    ss << expr->toString(depth + 1);
+  }
+  return ss.str();
 }
 
 FunctionExpr::FunctionExpr(std::unique_ptr<PrototypeExpr> proto, std::unique_ptr<BodyExpr> body)
@@ -120,6 +139,13 @@ IRValue *FunctionExpr::codegen() {
   // }
   body_->codegen();
   return nullptr;
+}
+
+std::string FunctionExpr::toString(int depth) {
+  std::stringstream ss;
+  ss << proto_->toString(depth);
+  ss << body_->toString(depth);
+  return ss.str();
 }
 
 IfExpr::IfExpr(std::unique_ptr<Expr> cond, std::unique_ptr<Expr> body, std::unique_ptr<Expr> other)
@@ -168,6 +194,19 @@ IRValue *IfExpr::codegen() {
   return nullptr;
 }
 
+std::string IfExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << "if";
+  ss << "\n";
+  ss << cond_->toString(depth);
+  ss << body_->toString(depth);
+  if (other_) ss << other_->toString(depth);
+  return ss.str();
+}
+
 WhileExpr::WhileExpr(std::unique_ptr<Expr> cond, std::unique_ptr<Expr> body) 
     : cond_(std::move(cond)), body_(std::move(body)) {
 }
@@ -191,6 +230,18 @@ IRValue *WhileExpr::codegen() {
   Builder.fuction()->setGoto(block_else, pos_else);
   Builder.fuction()->setGoto(block_while, pos_while);
   return nullptr;
+}
+
+std::string WhileExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << "while";
+  ss << "\n";
+  ss << cond_->toString(depth);
+  ss << body_->toString(depth);
+  return ss.str(); 
 }
 
 VarExpr::VarExpr(int token, std::string name)
@@ -233,6 +284,16 @@ IRValue *VarExpr::codegen() {
   return value;
 }
 
+std::string VarExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << name_;
+  ss << "\n";
+  return ss.str();
+}
+
 SubVarExpr::SubVarExpr(std::string name, int index) 
     : name_(name), index_(index) {
 }
@@ -243,6 +304,16 @@ int SubVarExpr::run() {
 
 IRValue *SubVarExpr::codegen() {
   return Builder.fuction()->CreateSubValue(name_, index_);
+}
+
+std::string SubVarExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << name_ << "[" << std::to_string(index_) << "]";
+  ss << "\n";
+  return ss.str();
 }
 
 NumberExpr::NumberExpr(double num_val)
@@ -259,6 +330,16 @@ IRValue *NumberExpr::codegen() {
   return Builder.fuction()->CreateNumber(num_val_);
 }
 
+std::string NumberExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << num_val_;
+  ss << "\n";
+  return ss.str();
+}
+
 ListExpr::ListExpr(std::string name, std::vector<double> num_vals)
     : name_(name), num_vals_(std::move(num_vals)) {
 }
@@ -269,6 +350,16 @@ int ListExpr::run() {
 
 IRValue *ListExpr::codegen() {
   return Builder.fuction()->CreateList(name_, num_vals_);
+}
+
+std::string ListExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << name_;
+  ss << "\n";
+  return ss.str();
 }
 
 BinaryExpr::BinaryExpr(int tok, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs)
@@ -335,6 +426,18 @@ IRValue *BinaryExpr::codegen() {
   return value;
 }
 
+std::string BinaryExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << std::to_string(tok_);
+  ss << "\n";
+  ss << lhs_->toString(depth + 1);
+  ss << rhs_->toString(depth + 1);
+  return ss.str();
+}
+
 CallExpr::CallExpr(std::string id, std::vector<std::unique_ptr<Expr>> args)
     : id_(id), args_(std::move(args)) {
 }
@@ -386,6 +489,19 @@ IRValue *CallExpr::codegen() {
   return Builder.fuction()->CreateCall(id_, args);
 }
 
+std::string CallExpr::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << id_;
+  ss << "\n";
+  for (auto &arg : args_) {
+    ss << arg->toString(depth + 1);
+  }
+  return ss.str();
+}
+
 ReturnExpe::ReturnExpe(std::unique_ptr<Expr> expr)
     : expr_(std::move(expr)) {
 }
@@ -399,6 +515,17 @@ int ReturnExpe::run() {
 IRValue *ReturnExpe::codegen() {
   return Builder.fuction()->CreateRet(expr_->codegen());
   // return nullptr;
+}
+
+std::string ReturnExpe::toString(int depth) {
+  std::stringstream ss;
+  for (int i = 0; i < depth; ++i) {
+    ss << "  ";
+  }
+  ss << "return";
+  ss << "\n";
+  ss << expr_->toString(depth + 1);
+  return ss.str();
 }
 
 }  // namespace smcc

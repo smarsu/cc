@@ -100,6 +100,8 @@ class AST {
 
   Token curtok() { return static_cast<Token>(cur_tok); }
 
+  std::string toString();
+
  private:
   Reader *reader() {
     return reader_;

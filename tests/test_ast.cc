@@ -20,6 +20,8 @@ int main(int argv, char *args[]) {
   smcc::AST ast(&reader);
 
   ast.parse();
+  
+  fprintf(stderr, "%s\n", ast.toString().c_str());
 
   fclose(fb);
 }

@@ -24,8 +24,8 @@ int main(int argv, char *args[]) {
 
   smcc::VM vm;
   // vm.setArgs(std::vector<double>{1, 2});
-  vm.exe("main", std::vector<double>{8000, 10}, 0);
-  fprintf(stderr, "%f\n", vm.getRet());
+  vm.exe("main", std::vector<double>{7000, 8380}, 0);
+  fprintf(stderr, "%f = main(15000, 16000)\n", vm.getRet());
 
   fclose(fb);
 }
